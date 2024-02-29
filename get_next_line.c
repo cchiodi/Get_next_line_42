@@ -6,7 +6,7 @@
 /*   By: cchiodi <cchiodi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/07 10:00:50 by cchiodi           #+#    #+#             */
-/*   Updated: 2024/02/26 18:48:12 by cchiodi          ###   ########.fr       */
+/*   Updated: 2024/02/28 12:34:03 by cchiodi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,42 +14,74 @@
 
 char	*ft_read_str(int fd, char *str)
 {
-	char	*buff;
+	char	buff[BUFFER_SIZE + 1];
 	int		read_bytes;
+	char	*linetot;
 
-	if (str == NULL)
-	{
-		str = (char *)malloc(1 * sizeof(char));
-		str[0] = '\0';
-	}
-	read_bytes = 1;
-	buff = malloc(sizeof(char) * BUFFER_SIZE + 1);
-	while (!ft_strchr(str, '\n') && read_bytes != 0)
+	if (str != NULL)
+		linetot = ft_strdup(str);
+	while (!ft_strchr(linetot, '\n'))
 	{
 		read_bytes = read(fd, buff, BUFFER_SIZE);
-		if (read_bytes <= 0)
-			break ;
-		str = ft_strjoin(str, buff);
+		buff[read_bytes] = '\0';
+		if (read_bytes == 0 && *linetot == '\0')
+		{
+			free(linetot);
+			return (NULL);
+		}
+		if (read_bytes == 0)
+			return (linetot);
+		if (read_bytes < 0)
+		{
+			free(linetot);
+			return (NULL);
+		}
+		linetot = ft_strjoin(linetot, buff);
 	}
-	free(buff);
-	if (str && *str)
-		return (str);
-	free(str);
-	return (NULL);
+	return (linetot);
+}
+
+void	savepointer(char *linetot, char *str)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	while (linetot[i] != '\n' && linetot[i] != '\0')
+		i++;
+	if (linetot[i] == '\n')
+	{
+		i++;
+		while (linetot[i] != '\0')
+		{
+			str[j] = linetot[i];
+			i++;
+			j++;
+		}
+		str[j] = '\0';
+	}
+	else
+	{
+		i = 0;
+		while (str[i] != '\0')
+			str[i++] = '\0';
+	}
 }
 
 char	*get_next_line(int fd)
 {
 	char		*line;
-	static char *str;
+	char		*linetot;
+	static char	str[BUFFER_SIZE];
 
-	line = 0;
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	str = ft_read_str(fd, str);
-	if (!str)
+	linetot = ft_read_str(fd, str);
+	if (linetot == NULL)
 		return (NULL);
-	line = ft_get_one_line(str);
-	
+	line = ft_get_one_line(linetot);
+	savepointer(linetot, str);
+	free(linetot);
 	return (line);
 }
