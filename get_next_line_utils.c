@@ -6,7 +6,7 @@
 /*   By: cchiodi <cchiodi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/07 10:40:31 by cchiodi           #+#    #+#             */
-/*   Updated: 2024/02/26 18:45:22 by cchiodi          ###   ########.fr       */
+/*   Updated: 2024/02/28 12:32:50 by cchiodi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,31 +61,51 @@ char	*ft_strjoin(char *str, char *buff)
 	while (buff[j])
 		newstr[i++] = buff[j++];
 	newstr[i] = '\0';
+	free (str);
+	i = 0;
+	while (buff[i] != '\0')
+		buff[i++] = '\0';
 	return (newstr);
 }
 
-char	*ft_get_one_line(char *str)
+char	*ft_get_one_line(char *linetot)
 {
 	int		i;
 	char	*line;
 
-	line = malloc(sizeof(char) * (ft_strlen(str) + 1));
+	i = 0;
+	while (linetot[i] != '\n' && linetot[i] != '\0')
+		i++;
+	if (linetot[i] == '\n')
+		i++;
+	line = malloc(sizeof(char) * (i + 1));
 	if (!line)
 		return (NULL);
 	i = 0;
-	while (str[i] != '\0' && str[i] != '\n')
+	while (linetot[i] != '\0' && linetot[i] != '\n')
 	{
-		line[i] = str[i];
+		line[i] = linetot[i];
 		i++;
 	}
-	if (str[i] == '\n')
-	{
-		line[i] = '\n';
-		i++;
-		line[i] = '\0';
-	}
-	else
-		line[i] = '\0';
+	if (linetot[i] == '\n')
+		line[i++] = '\n';
+	line[i] = '\0';
 	return (line);
 }
 
+char	*ft_strdup(char *s)
+{
+	char	*newstr;
+	int		size;
+	int		i;
+
+	size = ft_strlen(s);
+	newstr = (char *)malloc(sizeof(char) * (size + 1));
+	if (newstr == NULL)
+		return (NULL);
+	i = 0;
+	while (*s)
+		newstr[i++] = *s++;
+	newstr[i] = '\0';
+	return (newstr);
+}
